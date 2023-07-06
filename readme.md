@@ -1,4 +1,4 @@
-[![test](https://github.com/thalesmg/emqx-snowflake-sidecar/actions/workflows/test.yaml/badge.svg?branch=main)](https://github.com/thalesmg/emqx-snowflake-sidecar/actions/workflows/test.yaml)
+[![test](https://github.com/emqx/emqx-snowflake-proxy/actions/workflows/test.yaml/badge.svg?branch=main)](https://github.com/emqx/emqx-snowflake-proxy/actions/workflows/test.yaml)
 
 # prerequisites
 
@@ -47,8 +47,8 @@ clj
 ```sh
 clj -T:build uber
 
-java -jar target/emqx-snowflake-sidecar-0.0.0-standalone.jar
-java -jar target/emqx-snowflake-sidecar-0.0.0-standalone.jar -D taoensso.timbre.config.edn='{:min-level :info}'
+java -jar target/emqx-snowflake-proxy-0.0.0-standalone.jar
+java -jar target/emqx-snowflake-proxy-0.0.0-standalone.jar -D taoensso.timbre.config.edn='{:min-level :info}'
 ```
 
 ## testing

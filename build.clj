@@ -1,7 +1,7 @@
 (ns build
   (:require [clojure.tools.build.api :as b]))
 
-(def lib 'emqx-snowflake-sidecar)
+(def lib 'emqx-snowflake-proxy)
 (def version "0.0.0")
 (def class-dir "target/classes")
 (def basis (b/create-basis {:project "deps.edn"}))
