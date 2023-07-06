@@ -73,29 +73,29 @@
                         :response-time total)
               context))})
 
-(def upsert-channel
-  {:name ::upsert-channel
-   :enter
-   (fn [context]
-     (let [{:keys [:request]} context
-           {:keys [:json-params :path-params]} request
-           {:keys [:chan-name]} path-params
-           {:keys [:database :schema :table :on_error]} json-params
-           on-error (keyword on_error)
-           existing-chan-info (chan/chan-info chan-name)
-           chan-params {:chan-name chan-name
-                        :database database
-                        :schema schema
-                        :table table
-                        :on-error on-error}
-           chan-info (if (and existing-chan-info
-                              (chan/equal-params? existing-chan-info chan-params))
-                       existing-chan-info
-                       (do
-                         (chan/ensure-chan-deleted chan-name)
-                         (chan/ensure-streaming-agent chan-params)
-                         (chan/chan-info chan-name)))]
-       (assoc context :response {:status 200 :body chan-info})))})
+#_(def upsert-channel
+    {:name ::upsert-channel
+     :enter
+     (fn [context]
+       (let [{:keys [:request]} context
+             {:keys [:json-params :path-params]} request
+             {:keys [:chan-name]} path-params
+             {:keys [:database :schema :table :on_error]} json-params
+             on-error (keyword on_error)
+             existing-chan-info (chan/chan-info chan-name)
+             chan-params {:chan-name chan-name
+                          :database database
+                          :schema schema
+                          :table table
+                          :on-error on-error}
+             chan-info (if (and existing-chan-info
+                                (chan/equal-params? existing-chan-info chan-params))
+                         existing-chan-info
+                         (do
+                           (chan/ensure-chan-deleted chan-name)
+                           (chan/ensure-streaming-agent chan-params)
+                           (chan/chan-info chan-name)))]
+         (assoc context :response {:status 200 :body chan-info})))})
 
 (def get-chan
   {:name ::get-channel
@@ -107,13 +107,13 @@
          (assoc context :response {:status 200 :body chan-info})
          (assoc context :response {:status 404}))))})
 
-(def delete-chan
-  {:name ::delete-channel
-   :enter
-   (fn [context]
-     (let [chan-name (get-in context [:request :path-params :chan-name])]
-       (chan/ensure-chan-deleted chan-name)
-       (assoc context :response {:status 204})))})
+#_(def delete-chan
+    {:name ::delete-channel
+     :enter
+     (fn [context]
+       (let [chan-name (get-in context [:request :path-params :chan-name])]
+         (chan/ensure-chan-deleted chan-name)
+         (assoc context :response {:status 204})))})
 
 ;; TODO: validate input before this interceptor; pedestal-api???
 (def insert-rows
@@ -144,20 +144,20 @@
              (adapter-interceptor adapter/insert-rows-in)
              insert-rows]]
 
-     ["/channels/:chan-name"
-      :post [content-neg-interceptor
-             (body-params/body-params)
-             http/json-body
-             json-key-interceptor
-             (adapter-interceptor adapter/upsert-channel-in)
-             upsert-channel]]
-
-     ["/channels/:chan-name"
-      :delete [content-neg-interceptor
+     #_["/channels/:chan-name"
+        :post [content-neg-interceptor
                (body-params/body-params)
                http/json-body
                json-key-interceptor
-               delete-chan]]
+               (adapter-interceptor adapter/upsert-channel-in)
+               upsert-channel]]
+
+     #_["/channels/:chan-name"
+        :delete [content-neg-interceptor
+                 (body-params/body-params)
+                 http/json-body
+                 json-key-interceptor
+                 delete-chan]]
 
      ["/channels/:chan-name"
       :get [content-neg-interceptor
