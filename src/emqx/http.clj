@@ -173,18 +173,21 @@
    {::http/routes routes
     ::http/request-logger (interceptor log-request)
     ::http/type :jetty
-    ;; FIXME: for repl
-    ::http/join? false
+    ::http/join? (get params :join? false)
     ::http/host (get params :host "0.0.0.0")
     ::http/port (get params :port 9099)}))
 
+(defn start
+  [params]
+  (http/start (create-server params)))
+
 (defonce server (atom nil))
 
-(defn start
+(defn start-dev
   [params]
   (reset! server (http/start (create-server params))))
 
-(defn restart
+(defn restart-dev
   [params]
   (swap! server http/stop)
-  (reset! server (start params)))
+  (reset! server (start-dev params)))

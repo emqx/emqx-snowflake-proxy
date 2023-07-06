@@ -65,3 +65,6 @@ jobs:
             echo "${{ secrets.CONFIG_EDN }}" > config.edn
             clojure -X:test :includes '[:integration]'
           fi
+
+      - name: build uberjar
+        run: clojure -T:build uber

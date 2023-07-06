@@ -42,6 +42,15 @@ clj
 (server/start)
 ```
 
+## uberjar
+
+```sh
+clj -T:build uber
+
+java -jar target/emqx-snowflake-sidecar-0.0.0-standalone.jar
+java -jar target/emqx-snowflake-sidecar-0.0.0-standalone.jar -D taoensso.timbre.config.edn='{:min-level :info}'
+```
+
 ## testing
 
 ```sh

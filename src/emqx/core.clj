@@ -3,7 +3,8 @@
    [emqx.channel :as chan]
    [emqx.config :as config]
    [emqx.http :as http-server]
-   [taoensso.timbre :as log]))
+   [taoensso.timbre :as log])
+  (:gen-class))
 
 (defn -main
   [& args]
@@ -25,4 +26,9 @@
     (chan/start-client client)
     (doseq [chan-params channels]
       (chan/ensure-streaming-agent app-name chan-params))
-    (http-server/start server)))
+    (try
+      (http-server/start (assoc server :join? true))
+      (catch Exception e
+        (println (.getMessage e))
+        (.printStackTrace e)
+        (System/exit 1)))))
