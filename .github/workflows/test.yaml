@@ -61,7 +61,7 @@ jobs:
 
       - name: run integration tests
         run: |
-          if [[ ! -z "${{ secrets.PROFILE_JSON }}" ]]; then
-            echo "${{ secrets.PROFILE_JSON }}" > profile.json
+          if [[ ! -z "${{ secrets.CONFIG_EDN }}" ]]; then
+            echo "${{ secrets.CONFIG_EDN }}" > config.edn
             clojure -X:test :includes '[:integration]'
           fi

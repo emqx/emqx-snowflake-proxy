@@ -175,16 +175,16 @@
     ::http/type :jetty
     ;; FIXME: for repl
     ::http/join? false
-    ::http/host "0.0.0.0"
+    ::http/host (get params :host "0.0.0.0")
     ::http/port (get params :port 9099)}))
 
 (defonce server (atom nil))
 
 (defn start
-  []
-  (reset! server (http/start (create-server {}))))
+  [params]
+  (reset! server (http/start (create-server params))))
 
 (defn restart
-  []
+  [params]
   (swap! server http/stop)
-  (reset! server (start)))
+  (reset! server (start params)))

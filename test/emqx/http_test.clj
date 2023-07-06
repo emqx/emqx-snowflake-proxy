@@ -5,8 +5,9 @@
   (:require
    [cheshire.core :as json]
    [clojure.test :refer [deftest is testing use-fixtures]]
+   [emqx.config :as config]
    [emqx.channel :as chan]
-   [emqx.http :as server]
+   [emqx.http :as http-server]
    [io.pedestal.http :as http]
    [io.pedestal.http.route :as route]
    [io.pedestal.test :refer [response-for]]
@@ -14,15 +15,16 @@
 
 (defn make-service
   []
-  (::http/service-fn (http/create-servlet {::http/routes server/routes})))
+  (::http/service-fn (http/create-servlet {::http/routes http-server/routes})))
 
-(def url-for (route/url-for-routes server/routes))
+(def url-for (route/url-for-routes http-server/routes))
 
 (def ^:dynamic *service* nil)
 
 (defn client-fixture
   [f]
-  (chan/start-client)
+  (let [{:keys [:client]} (config/get-config!)]
+    (chan/start-client client))
   (f)
   (chan/stop-client))
 
@@ -39,13 +41,13 @@
 (defn get-channel
   [chan-name]
   (response-for *service*
-                :get (url-for ::server/get-channel
+                :get (url-for ::http-server/get-channel
                               :path-params {:chan-name chan-name})))
 
 #_(defn upsert-channel
     [chan-name chan-params]
     (response-for *service*
-                  :post (url-for ::server/upsert-channel
+                  :post (url-for ::http-server/upsert-channel
                                  :path-params {:chan-name chan-name})
                   :headers {"Content-Type" "application/json"}
                   :body (json/generate-string chan-params)))
@@ -53,7 +55,7 @@
 #_(defn delete-channel
     [chan-name]
     (response-for *service*
-                  :delete (url-for ::server/delete-channel
+                  :delete (url-for ::http-server/delete-channel
                                    :path-params {:chan-name chan-name})))
 
 #_(deftest ^:integration channels-test
@@ -163,7 +165,7 @@
 (defn insert-rows
   [chan-name body-params]
   (response-for *service*
-                :post (url-for ::server/insert-rows
+                :post (url-for ::http-server/insert-rows
                                :path-params {:chan-name chan-name})
                 :headers {"Content-Type" "application/json"}
                 :body (json/generate-string body-params)))
@@ -176,12 +178,9 @@
       (let [resp (insert-rows chan-name valid-rows)]
         (is (= 404 (:status resp)))))
 
-    (let [chan-params {:chan-name chan-name
-                       :database "TESTDATABASE"
-                       :schema "PUBLIC"
-                       :table "TESTTABLE"
-                       :on-error :continue}]
-      (chan/ensure-streaming-agent chan-params))
+    (let [{:keys [:app-name :channels]} (config/get-config!)]
+      (doseq [chan-params channels]
+        (chan/ensure-streaming-agent app-name chan-params)))
 
     (testing "inserting valid rows"
       (let [resp (insert-rows chan-name valid-rows)]

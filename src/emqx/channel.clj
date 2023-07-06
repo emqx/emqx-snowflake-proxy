@@ -1,6 +1,6 @@
 (ns emqx.channel
   (:require
-   [cheshire.core :as json]
+   [camel-snake-kebab.core :as csk]
    [taoensso.timbre :as log])
   (:import
    [java.util Properties]
@@ -18,12 +18,12 @@
 (defonce channel-manager (agent {}))
 
 (defn start-client
-  []
-  (let [params (json/parse-string (slurp "profile.json"))
-        props (Properties.)
-        _ (doseq [[^String k ^String v] params]
-            (.setProperty props k (str v)))
-        c (.. (SnowflakeStreamingIngestClientFactory/builder "my_client")
+  [{:keys [:client-name] :as params}]
+  (let [props (Properties.)
+        _ (doseq [[k v] params
+                  :when (not= :client-name k)]
+            (.setProperty props (csk/->snake_case_string k) (str v)))
+        c (.. (SnowflakeStreamingIngestClientFactory/builder client-name)
               (setProperties props)
               (build))]
     (reset! client c)))
@@ -47,11 +47,14 @@
   function provided to `swap!` _may_ be executed multiple times, so it
   should be side-effect free.  We then use an agent to serialize the
   side-effects."
-  [{:keys [:chan-name :database :schema :table :on-error] :as chan-params}]
+  [app-name {:keys [:chan-name :database :schema :table :on-error] :as chan-params}]
   ;; see https://github.com/snowflakedb/snowflake-ingest-java/blob/64182caf0af959271f4249e4bef9203e2a1f6d8d/profile_streaming.json.example
   (let [on-error (case on-error
                    :continue OpenChannelRequest$OnErrorOption/CONTINUE
                    :abort OpenChannelRequest$OnErrorOption/ABORT)
+        ;; each channel should be owned by a single
+        ;; process/application to avoid invalidating each other.
+        chan-name (str chan-name "-" app-name)
         chan-req (.. (OpenChannelRequest/builder chan-name)
                      (setDBName database)
                      (setSchemaName schema)
@@ -65,20 +68,20 @@
     chan-agent))
 
 (defn- do-ensure-streaming-agent
-  [state {:keys [:chan-name] :as params} reply-promise]
+  [state app-name {:keys [:chan-name] :as params} reply-promise]
   (let [chan-agent (@channels chan-name)]
     (if chan-agent
       ;; already created by a concurrent call
       (deliver reply-promise chan-agent)
-      (let [chan-agent (start-streaming-agent params)]
+      (let [chan-agent (start-streaming-agent app-name params)]
         (swap! channels assoc chan-name chan-agent)
         (deliver reply-promise chan-agent)))
     state))
 
 (defn ensure-streaming-agent
-  [params]
+  [app-name params]
   (let [reply-promise (promise)]
-    (send-off channel-manager do-ensure-streaming-agent params reply-promise)
+    (send-off channel-manager do-ensure-streaming-agent app-name params reply-promise)
     @reply-promise))
 
 ;; note: offset can be null when the channel is new.

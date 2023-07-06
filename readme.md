@@ -1,9 +1,32 @@
 [![test](https://github.com/thalesmg/emqx-snowflake-sidecar/actions/workflows/test.yaml/badge.svg?branch=main)](https://github.com/thalesmg/emqx-snowflake-sidecar/actions/workflows/test.yaml)
 
+# prerequisites
+
+1. Have an account on Snowflake
+2. Clojure 1.11
+3. Have an user with a role that has the sufficient privileges on all relevant objects.
+   - Such role must have:
+      - `USAGE` on the database.
+4. Set up a key pair for the user.
+   - Create a key pair
+     ```sh
+     openssl genrsa 2048 | openssl pkcs8 -topk8 -inform PEM -out snowflake_rsa_key.p8 -nocrypt
+     openssl rsa -in snowflake_rsa_key.p8 -pubout -out snowflake_rsa_key.pub
+     ```
+   - Associate the public key with the user in Snowflake.
+     ```sql
+     alter user testuser set rsa_public_key='MII...';
+     desc user testuser;
+     ```
+5. Configure the service using `config.edn`.  See `config.example.edn` for an example.
+6. While it's not required, setting the `APP_NAME` environment variable to an unique and
+   fixed string per container/process is recommended to avoid creating unlimited channels
+   when the container/process restarts.  Otherwise, an UUID is generated and used.
+
 ## running directly
 
 ```sh
-clj -M -m emqx.core
+env APP_NAME=myapp clj -M -m emqx.core
 ```
 
 ## running with repl
@@ -22,7 +45,7 @@ clj
 ## testing
 
 ```sh
-clj -X:test
+env APP_NAME=myapp clj -X:test
 
 # only tests marked as :integration
 clj -X:test :includes '[:integration]'

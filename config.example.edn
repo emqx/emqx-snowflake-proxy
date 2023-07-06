@@ -1,0 +1,20 @@
+{:client {:client-name "MY_CLIENT"
+          :user "TESTUSER"
+          :url "https://ORG_ID-ACCOUNT_ID.snowflakecomputing.com:443"
+          :private-key "-----BEGIN PRIVATE KEY-----\nMII...\n-----END PRIVATE KEY-----\n"
+          :port 443
+          :host "ORG_ID-ACCOUNT_ID.snowflakecomputing.com"
+          :scheme "https"
+          :role "TESTROLE"}
+ :channels [{:chan-name "my_channel"
+             :database "TESTDATABASE"
+             :schema "PUBLIC"
+             :table "TESTTABLE"
+             :on-error :continue}
+            {:chan-name "my_channel2"
+             :database "TESTDATABASE"
+             :schema "PUBLIC"
+             :table "TESTTABLE2"
+             :on-error :abort}]
+ :server {:host "0.0.0.0"
+          :port 9099}}
