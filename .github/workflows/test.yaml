@@ -68,3 +68,11 @@ jobs:
 
       - name: build uberjar
         run: clojure -T:build uber
+
+      - name: upload uberjar
+        uses: actions/upload-artifact@v3
+        with:
+          name: uberjar
+          retention-days: 1
+          path: |
+            target/emqx-snowflake-proxy-*-standalone.jar
