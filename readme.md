@@ -51,6 +51,13 @@ java -jar target/emqx-snowflake-proxy-0.0.0-standalone.jar
 java -jar target/emqx-snowflake-proxy-0.0.0-standalone.jar -D taoensso.timbre.config.edn='{:min-level :info}'
 ```
 
+## docker
+
+```bash
+docker build . -t emqx/emqx-snowflake-proxy
+docker run -v ./config.edn:/usr/src/app/config.edn emqx/emqx-snowflake-proxy
+```
+
 ## testing
 
 ```sh
