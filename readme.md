@@ -7,6 +7,8 @@
 3. Have an user with a role that has the sufficient privileges on all relevant objects.
    - Such role must have:
       - `USAGE` on the database.
+      - `CREATE STREAM` and `USAGE` on the schema.
+      - `INSERT` on the table(s).
 4. Set up a key pair for the user.
    - Create a key pair
      ```sh
