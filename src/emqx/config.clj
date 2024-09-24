@@ -12,8 +12,7 @@
    :private-key s/Str
    :port s/Num
    :host s/Str
-   :scheme s/Str
-   :role s/Str})
+   :scheme s/Str})
 
 (s/defschema MQTTConfig
   {:host s/Str
