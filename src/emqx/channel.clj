@@ -1,7 +1,7 @@
 (ns emqx.channel
   (:require
    [camel-snake-kebab.core :as csk]
-   [taoensso.timbre :as log])
+   [emqx.log :as log])
   (:import
    [java.util Properties]
    [net.snowflake.ingest.streaming
@@ -91,15 +91,17 @@
   (try
     (.getLatestCommittedOffsetToken chan)
     (catch SFException e
-      (log/error :msg ::get-latest-commited-offset-exception
-                 :exception (.getMessage e)
-                 :cause (.getCause e)
-                 :vendor-code (.getVendorCode e))
+      (log/error!
+       ::get-latest-commited-offset-exception
+       :exception (.getMessage e)
+       :cause (.getCause e)
+       :vendor-code (.getVendorCode e))
       (.printStackTrace e)
       nil)
     (catch Exception e
-      (log/error :msg ::get-latest-commited-offset-exception
-                 :exception (.getMessage e))
+      (log/error!
+       ::get-latest-commited-offset-exception
+       :exception (.getMessage e))
       nil)))
 
 ;; TODO: return partial success count???
@@ -113,29 +115,36 @@
                           (map (fn [e]
                                  {:row-index (.getRowIndex e)
                                   :message (.getMessage e)})))]
-          (log/error :msg ::insert-row-errors :errors errors :offset-token offset-token)
+          (log/error!
+           ::insert-row-errors
+           :errors errors
+           :offset-token offset-token)
           {:errors errors})
         (do
-          (log/debug :msg ::insert-rows-success :offset-token offset-token)
+          (log/debug!
+           ::insert-rows-success
+           :offset-token offset-token)
           {:errors nil})))
     (catch SFException e
-      (log/error :msg ::insert-row-exception
-                 :exception (.getMessage e)
-                 :cause (.getCause e)
-                 :vendor-code (.getVendorCode e)
-                 :offset-token offset-token)
+      (log/error!
+       ::insert-row-exception
+       :exception (.getMessage e)
+       :cause (.getCause e)
+       :vendor-code (.getVendorCode e)
+       :offset-token offset-token)
       (.printStackTrace e)
       {:errors [(.getMessage e)]
        :vendor-code (.getVendorCode e)})
     (catch Exception e
-      (log/error :msg ::insert-row-exception
-                 :exception (.getMessage e)
-                 :offset-token offset-token)
+      (log/error!
+       ::insert-row-exception
+       :exception (.getMessage e)
+       :offset-token offset-token)
       {:errors [(.getMessage e)]})))
 
 (defn- insert-rows
   [{:keys [:chan :n] :as state} rows reply-promise]
-  (log/debug :msg ::insert-rows-enter :rows rows)
+  (log/debug! ::insert-rows-enter :rows rows)
   (let [row-count (count rows)
         offset-token (str (+ n row-count))
         response (do-insert-rows chan rows offset-token)]
@@ -160,10 +169,11 @@
   (if-let [channel-agent (@channels chan-name)]
     (let [{:keys [:chan]} @channel-agent]
       (.close chan)
-      (log/info :msg ::channel-closed
-                :chan-name chan-name
-                :closed? (.isClosed chan)
-                :valid? (.isValid chan))
+      (log/info!
+       ::channel-closed
+       :chan-name chan-name
+       :closed? (.isClosed chan)
+       :valid? (.isValid chan))
       (swap! channels dissoc chan-name)
       (deliver reply-promise true))
     (deliver reply-promise true))

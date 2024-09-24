@@ -3,7 +3,7 @@
 # prerequisites
 
 1. Have an account on Snowflake
-2. Clojure 1.11
+2. Clojure 1.11+
 3. Have an user with a role that has the sufficient privileges on all relevant objects.
    - Such role must have:
       - `USAGE` on the database.
@@ -38,10 +38,13 @@ clj
 ```
 
 ```clojure
-(require '[emqx.http :as server])
+(require '[emqx.config :as config])
 (require '[emqx.channel :as chan])
-(chan/start-client)
-(server/start)
+(let [{:keys [:app-name :client :channels]} (config/get-config!)]
+  (chan/start-client client)
+  (doseq [chan-params channels]
+    (chan/ensure-streaming-agent app-name chan-params)
+    (mqtt/start-client chan-params)))
 ```
 
 ## uberjar
@@ -50,7 +53,6 @@ clj
 clj -T:build uber
 
 java -jar target/emqx-snowflake-proxy-0.0.0-standalone.jar
-java -jar target/emqx-snowflake-proxy-0.0.0-standalone.jar -D taoensso.timbre.config.edn='{:min-level :info}'
 ```
 
 ## docker

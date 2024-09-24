@@ -4,17 +4,24 @@
           :private-key "-----BEGIN PRIVATE KEY-----\nMII...\n-----END PRIVATE KEY-----\n"
           :port 443
           :host "ORG_ID-ACCOUNT_ID.snowflakecomputing.com"
-          :scheme "https"
-          :role "TESTROLE"}
+          :scheme "https"}
  :channels [{:chan-name "my_channel"
              :database "TESTDATABASE"
              :schema "PUBLIC"
              :table "TESTTABLE"
-             :on-error :continue}
+             :on-error :continue
+             :mqtt {:host "emqx1.emqx.net"
+                    :port 1883
+                    :clientid "chan1"
+                    :topic "t/sf/1"
+                    :qos 1}}
             {:chan-name "my_channel2"
              :database "TESTDATABASE"
              :schema "PUBLIC"
              :table "TESTTABLE2"
-             :on-error :abort}]
- :server {:host "0.0.0.0"
-          :port 9099}}
+             :on-error :abort
+             :mqtt {:host "emqx1.emqx.net"
+                    :port 1883
+                    :clientid "chan2"
+                    :topic "t/sf/2"
+                    :qos 1}}]}

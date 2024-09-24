@@ -16,3 +16,4 @@ pom.xml.asc
 /profile.json
 /.lsp/
 /config.edn
+.rebel_readline_history

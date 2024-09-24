@@ -1,21 +1,18 @@
 {:paths ["src" "resources"]
  :deps {
         ;; https://mvnrepository.com/artifact/net.snowflake/snowflake-ingest-sdk
-        net.snowflake/snowflake-ingest-sdk {:mvn/version "2.0.1"}
+        net.snowflake/snowflake-ingest-sdk {:mvn/version "2.2.2"
+                                            :exclusions [org.slf4j/slf4j-api]}
 
-        ;; https://mvnrepository.com/artifact/org.eclipse.paho/org.eclipse.paho.client.mqttv3
-        ;; org.eclipse.paho/org.eclipse.paho.client.mqttv3 {:mvn/version "1.2.5"}
+        clojurewerkz/machine_head {:mvn/version "1.0.0"}
 
-        io.pedestal/pedestal.jetty {:mvn/version "0.6.0"}
-        io.pedestal/pedestal.route {:mvn/version "0.6.0"}
-        io.pedestal/pedestal.service {:mvn/version "0.6.0"}
-        ;; https://mvnrepository.com/artifact/org.slf4j/slf4j-simple
-        ;; org.slf4j/slf4j-simple {:mvn/version "2.0.7"}
-        com.fzakaria/slf4j-timbre {:mvn/version "0.4.0"}
+        ;; https://mvnrepository.com/artifact/org.slf4j/slf4j-api
+        org.slf4j/slf4j-api {:mvn/version "2.0.16"}
+        com.taoensso/telemere {:mvn/version "1.0.0-beta22"}
+        com.taoensso/telemere-slf4j {:mvn/version "1.0.0-beta22"}
 
         prismatic/schema {:mvn/version "1.4.1"}
         camel-snake-kebab/camel-snake-kebab {:mvn/version "0.4.3"}
-        com.taoensso/timbre {:mvn/version "6.2.1"}
         org.clojure/tools.cli {:mvn/version "1.0.219"}
         cheshire/cheshire {:mvn/version "5.11.0"}
         funcool/cats {:mvn/version "2.4.2"}
