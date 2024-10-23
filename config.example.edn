@@ -14,7 +14,8 @@
                     :port 1883
                     :clientid "chan1"
                     :topic "t/sf/1"
-                    :qos 1}}
+                    :qos 1
+                    :clean-start false}}
             {:chan-name "my_channel2"
              :database "TESTDATABASE"
              :schema "PUBLIC"
@@ -24,4 +25,5 @@
                     :port 1883
                     :clientid "chan2"
                     :topic "t/sf/2"
-                    :qos 1}}]}
+                    :qos 1
+                    :clean-start false}}]}
