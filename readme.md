@@ -59,7 +59,7 @@ java -jar target/emqx-snowflake-proxy-0.0.0-standalone.jar
 
 ```bash
 docker build . -t emqx/emqx-snowflake-proxy
-docker run -v ./config.edn:/usr/src/app/config.edn emqx/emqx-snowflake-proxy
+docker run -v ./config.edn:/opt/proxy/config.edn ghcr.io/emqx/emqx-snowflake-proxy
 ```
 
 ## testing

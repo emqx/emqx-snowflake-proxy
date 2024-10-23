@@ -20,6 +20,7 @@
    :clientid s/Str
    :topic s/Str
    :qos (s/enum 0 1 2)
+   (s/optional-key :clean-start) s/Bool
    (s/optional-key :username) s/Str
    (s/optional-key :password) s/Str})
 

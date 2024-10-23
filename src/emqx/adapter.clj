@@ -4,14 +4,15 @@
    [cheshire.core :as json]))
 
 (defn mqtt-client-config
-  [{:keys [:host :port :clientid :topic :qos :username :password]}]
+  [{:keys [:host :port :clientid :topic :qos :clean-start :username :password]}]
   {:uri (str "tcp://" host ":" port)
    :clientid clientid
    :topic topic
    :qos qos
    :opts (cond-> {:auto-reconnect true}
            username (assoc :username username)
-           password (assoc :password password))})
+           password (assoc :password password)
+           (boolean? clean-start) (assoc :clean-session clean-start))})
 
 (defn channel-data-in
   "Parses the incoming payload and expects it to be a JSON encoded object"
