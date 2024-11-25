@@ -1,9 +1,8 @@
 (ns emqx.channel
   (:require
-   [camel-snake-kebab.core :as csk]
+   [emqx.adapter :as adapter]
    [emqx.log :as log])
   (:import
-   [java.util Properties]
    [net.snowflake.ingest.streaming
     SnowflakeStreamingIngestClientFactory
     OpenChannelRequest
@@ -19,10 +18,10 @@
 
 (defn start-client
   [{:keys [:client-name] :as params}]
-  (let [props (Properties.)
-        _ (doseq [[k v] params
-                  :when (not= :client-name k)]
-            (.setProperty props (csk/->snake_case_string k) (str v)))
+  (let [[props proxy-props] (adapter/channel-client-config->props params)
+        _ (when proxy-props
+            (doseq [[k v] proxy-props]
+              (System/setProperty k v)))
         c (.. (SnowflakeStreamingIngestClientFactory/builder client-name)
               (setProperties props)
               (build))]

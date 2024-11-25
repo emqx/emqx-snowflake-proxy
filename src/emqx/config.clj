@@ -5,6 +5,12 @@
    [schema.coerce :as coerce]
    [schema.core :as s]))
 
+(s/defschema ClientProxyConfig
+  {:host s/Str
+   :port s/Num
+   (s/optional-key :user) s/Str
+   (s/optional-key :password) s/Str})
+
 (s/defschema ClientConfig
   {:client-name s/Str
    :user s/Str
@@ -12,7 +18,8 @@
    :private-key s/Str
    :port s/Num
    :host s/Str
-   :scheme s/Str})
+   :scheme s/Str
+   (s/optional-key :proxy) ClientProxyConfig})
 
 (s/defschema MQTTConfig
   {:host s/Str
