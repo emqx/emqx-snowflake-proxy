@@ -4,7 +4,14 @@
           :private-key "-----BEGIN PRIVATE KEY-----\nMII...\n-----END PRIVATE KEY-----\n"
           :port 443
           :host "ORG_ID-ACCOUNT_ID.snowflakecomputing.com"
-          :scheme "https"}
+          :scheme "https"
+          ;; uncomment the `:proxy` field if you need to use an HTTP proxy
+          ;; to uncomment, simply remove the `_#` prefixes
+          #_:proxy #_{:host "my.proxy.host"
+                  :port 1234
+                  :user "proxy-user"
+                  :password "secret-proxy-pass"}
+          }
  :channels [{:chan-name "my_channel"
              :database "TESTDATABASE"
              :schema "PUBLIC"

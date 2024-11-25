@@ -49,3 +49,53 @@
                                                               :password "bar"})
                                  :opts
                                  (select-keys [:username :password]))))))
+
+(deftest channel-client-config->props
+  (let [base-proxy-params {:host "proxy.host.com" :port 1234}
+        base-params {:client-name "client-name"
+                     :user "client-user"
+                     :url "snowflake.url.com"
+                     :private-key "secret-private-key"
+                     :port 443
+                     :host "snowflake.host"
+                     :scheme "https"}]
+    (testing "no proxy config"
+      (let [props (adapter/channel-client-config->props base-params)]
+        (is (= [{"scheme" "https"
+                 "port" "443"
+                 "host" "snowflake.host"
+                 "private_key" "secret-private-key"
+                 "user" "client-user"
+                 "url" "snowflake.url.com"}
+                nil]
+               props))))
+    (testing "proxy config, no username and password"
+      (let [props (adapter/channel-client-config->props (assoc base-params :proxy base-proxy-params))]
+        (is (= [{"scheme" "https"
+                 "port" "443"
+                 "host" "snowflake.host"
+                 "private_key" "secret-private-key"
+                 "user" "client-user"
+                 "url" "snowflake.url.com"}
+                {"http.useProxy" "true"
+                 "http.proxyHost" "proxy.host.com"
+                 "http.proxyPort" "1234"}]
+               props))))
+    (testing "proxy config, with username and password"
+      (let [props (-> base-params
+                      (assoc :proxy base-proxy-params)
+                      (assoc-in [:proxy :user] "proxy-user")
+                      (assoc-in [:proxy :password] "proxy-password")
+                      adapter/channel-client-config->props)]
+        (is (= [{"scheme" "https"
+                 "port" "443"
+                 "host" "snowflake.host"
+                 "private_key" "secret-private-key"
+                 "user" "client-user"
+                 "url" "snowflake.url.com"}
+                {"http.useProxy" "true"
+                 "http.proxyHost" "proxy.host.com"
+                 "http.proxyPort" "1234"
+                 "http.proxyUser" "proxy-user"
+                 "http.proxyPassword" "proxy-password"}]
+               props))))))
