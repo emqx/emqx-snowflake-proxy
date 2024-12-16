@@ -1,0 +1,37 @@
+services:
+  emqx:
+    image: emqx/emqx-enterprise:5.8.0
+    networks:
+      - tmp
+    healthcheck:
+      test: curl --fail mqtt://127.0.0.1:1883/t -d a || exit 1
+      interval: 10s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+  snowflake:
+    depends_on:
+      emqx:
+        condition: service_healthy
+      tinyproxy:
+        condition: service_started
+    image: ghcr.io/emqx/emqx-snowflake-proxy:2.0.3
+    networks:
+      - tmp
+    volumes:
+      - ./config.edn:/opt/proxy/config.edn:ro
+  tinyproxy:
+    image: monokal/tinyproxy
+    networks:
+      - tmp
+    environment:
+      BASIC_AUTH_USER: user
+      BASIC_AUTH_PASSWORD: pass
+    command: ["ANY"]
+networks:
+  tmp:
+    driver: bridge
+    name: tmp
+    enable_ipv6: true
+    ipam:
+      driver: default
